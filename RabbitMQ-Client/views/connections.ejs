@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title><%= title %></title>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+<link rel="shortcut icon" href="/images/logo.png">
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<style type="text/css">
+#header {
+	background-color: #3F3F3F;
+	background: #333;
+	background-image: -webkit-linear-gradient(top, #555555 0%, #515151 18%, #373737 85%,
+		#333333 100%);
+	background-image: -moz-linear-gradient(top, #555555 0%, #515151 18%, #373737 85%, #333333
+		100%);
+	background-image: -o-linear-gradient(top, #555555 0%, #515151 18%, #373737 85%, #333333
+		100%);
+	background-image: linear-gradient(top, #555555 0%, #515151 18%, #373737 85%, #333333 100%);
+	-webkit-box-shadow: 0 0 10px #333;
+	-moz-box-shadow: 0 0 10px #333;
+	background-image: -moz-linear-gradient(center top, #696969 0%, #3F3F3F 100%);
+}
+</style>
+</head>
+
+<body ng-app="connections" ng-controller="connectionsController"
+	ng-init="loadConnections();loadPendingConnections();">
+	<div class="row" id="header" name="header">
+		<div class="col-md-2"></div>
+		<div class="col-md-2" style="margin: 10px;">
+			<img src="/images/logo.png" width="40px" height="40px" />
+		</div>
+		<form action="logout" method="post">
+			<div class="col-md-4">
+				<h4 style="margin: 10px; color: white;"><%= userFirstname %>
+					&nbsp;<%= userLastname %></h4>
+				<h4>
+					<small style="margin: 10px; color: white;">Last logged In :
+						<%= userLastLoggedIn %></small>
+				</h4>
+				<input type="hidden" id="last_logged_in"
+					value="<%= userLastLoggedIn %>" />
+			</div>
+			<div class="col-md-2" style="margin: 10px;" ng-controller="logout">
+				<input type="button" class="btn btn-default" id="logout"
+					name="logout" value="Sign Out" ng-click="logout();" />
+			</div>
+		</form>
+	</div>
+
+	<div class="row"
+		style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; margin-bottom: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15); padding: 10px;">
+		<div class="col-md-10">
+			<input ng-model="searchName" class="form-control"
+				placeHolder="Enter the name" />
+		</div>
+		<div class="col-md-2">
+			<input type="button" ng-click="search(searchName);"
+				class="btn btn-default" style="vertical-align: middle;"
+				value="Search" />
+
+		</div>
+		<div class="col-md-12" style="margin-top: 30px;">
+			<span ng-show="noData">No results</span>
+		</div>
+		<div ng-repeat="searchedConnection in searchedConnections">
+			<div class="col-md-12">
+				<h3>
+					<small style="color: black;"> <span>{{searchedConnection.user_firstname}}</span>
+						<span>{{searchedConnection.user_lastname}}</span>
+					</small>
+				</h3>
+				<h4>
+					<small> <span>{{searchedConnection.user_email}}</span>
+					</small>
+				</h4>
+				<button ng-click="sendInvite(searchedConnection.user_id);"
+					class="btn btn-default">Send Invite</button>
+			</div>
+		</div>
+		<div class="col-md-12" style="margin-top: 30px;">
+			<span ng-show="already_connected" style="color: green;">User
+				already a connection or Already request has been sent</span> <span
+				ng-show="request_sent" style="color: green;">Request sent</span> <span
+				ng-show="remaining" style="color: red;">Some problem with the
+				invitation, send again</span>
+		</div>
+	</div>
+
+	<div class="row"
+		style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden;">
+		<div class="col-md-12"
+			style="margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<h3>
+				Connections <small>{{count}}</small>
+			</h3>
+		</div>
+		<div ng-repeat="conn in connect">
+			<div class="col-md-12">
+				<h3>
+					<small style="color: black; cursor: pointer;"> <span>{{conn.connections_firstname}}</span>
+						<span>{{conn.connections_lastname}}</span>
+					</small>
+				</h3>
+				<h4>
+					<small><span>{{conn.profile_status}}</span></small>
+
+				</h4>
+				<h4>
+					<small><span>{{conn.profile_location}}</span></small>
+
+				</h4>
+			</div>
+		</div>
+	</div>
+
+	<div class="row"
+		style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15); margin-bottom: 30px;">
+		<div class="col-md-12">
+			<h3>
+				Pending Connections <small></small>
+			</h3>
+		</div>
+		<span ng-show="no_pending_request" style="color: green;">No
+			Pending requests</span>
+		<div ng-repeat="pendingConnection in pendingConnections">
+			<div class="col-md-12" style="padding: 20px;">
+				<h3>
+					<small style="color: black; cursor: pointer;"> <span>{{pendingConnection.connections_firstname}}</span>
+						<span>{{pendingConnection.connections_lastname}}</span>
+					</small>
+				</h3>
+
+				<button
+					ng-click="ApproveReject(pendingConnection.connections_ref_id,pendingConnection.connections_id,1);"
+					class="btn btn-default">Accept</button>
+				<button
+					ng-click="ApproveReject(pendingConnection.connections_ref_id,pendingConnection.connections_id,0);"
+					class="btn btn-default">Reject</button>
+			</div>
+		</div>
+	</div>
+
+
+
+	<script>
+		var connections = angular.module('connections', []);
+
+		connections.controller('logout', function($scope, $http) {
+
+			$scope.logout = function() {
+				$http({
+					method : 'POST',
+					url : '/logout'
+				}).success(function(data, status, headers, config) {
+					if (data.statusCode == 204) {
+						window.location = "/";
+					}
+				}).error(function(data, status, headers, config) {
+				});
+			};
+
+		});
+
+		connections.controller('connectionsController', function($scope, $http,
+				$q, $timeout) {
+
+			$scope.loadConnections = function() {
+
+				$http({
+					method : 'GET',
+					url : '/connectionsGet'
+				}).success(function(data, status, headers, config) {
+
+					$scope.connect = data.resultSet;
+					$scope.count = "(" + data.resultSet.length + ")";
+				}).error(function(data, status, headers, config) {
+				});
+			};
+
+			$scope.loadPendingConnections = function() {
+				$http({
+					method : 'GET',
+					url : '/getPendingConnections'
+				}).success(function(data, status, headers, config) {
+					alert(data.resultSet.length);
+					if (data.resultSet.length == 0) {
+						$scope.no_pending_request = !$scope.no_pending_request;
+					}
+					$scope.pendingConnections = data.resultSet;
+				}).error(function(data, status, headers, config) {
+				});
+			};
+
+			$scope.ApproveReject = function(user_ref_id, user_id,
+					acceptOrReject) {
+				if (acceptOrReject == 1) {
+
+					$http({
+						method : 'POST',
+						url : '/addConnections',
+						data : {
+							"addConnectionToUserId" : user_id,
+							"addConnectionToRefUserId" : user_ref_id
+						}
+					}).success(function(data, status, headers, config) {
+						if (data.statusCode == 204) {
+							$scope.loadConnections();
+							$scope.loadPendingConnections();
+						} else {
+							alert("Adding a connection failed, try again");
+						}
+					}).error(function(data, status, headers, config) {
+					});
+
+				} else {
+					$http({
+						method : 'POST',
+						url : '/rejectConnection',
+						data : {
+							"connectionToUserId" : user_id,
+							"connectionToRefUserId" : user_ref_id
+						}
+					}).success(function(data, status, headers, config) {
+						if (data.statusCode == 204) {
+							$scope.loadConnections();
+							$scope.loadPendingConnections();
+						} else {
+							alert("Adding a connection failed, try again");
+						}
+					}).error(function(data, status, headers, config) {
+					});
+				}
+
+			};
+
+			$scope.search = function(searchName) {
+				$http({
+					method : 'POST',
+					url : '/getSearchedConnections',
+					data : {
+						"searchName" : searchName
+					}
+				}).success(function(data, status, headers, config) {
+
+					if (data.resultSet.length == 0) {
+						$scope.noData = !$scope.noData;
+					}
+					$scope.searchedConnections = data.resultSet;
+				}).error(function(data, status, headers, config) {
+				});
+			};
+
+			$scope.sendInvite = function(user_id) {
+				$http({
+					method : 'POST',
+					url : '/sendInvitation',
+					data : {
+						"user_id" : user_id
+					}
+				}).success(function(data, status, headers, config) {
+					if (data.statusCode == 204) {
+						$scope.already_connected = !$scope.already_connected;
+					} else if (data.statusCode == 201) {
+						$scope.request_sent = !$scope.request_sent;
+					} else {
+						$scope.remaining = !$scope.remaining;
+					}
+				}).error(function(data, status, headers, config) {
+					$scope.remaining = !$scope.remaining;
+				});
+			}
+
+		});
+	</script>
+</body>
+</html>

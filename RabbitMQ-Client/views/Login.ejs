@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title><%= title %></title>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+<link rel="shortcut icon" href="/images/logo.png">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+
+</head>
+<body ng-app="login">
+	<div class="row">
+		<div class="col-md-12"
+			style="box-shadow: 1px 0px 5px 8px rgba(0, 0, 0, 0.1); background: #F4F4F4;">
+			<div class="row">
+				<div class="col-md-2"></div>
+				<div class="col-md-2">
+					<img alt="" src="/images/logo-2.png" width="150px" height="50px"
+						style="margin: 20px;" />
+				</div>
+				<div class="col-md-2"></div>
+				<div class="col-md-6" ng-controller="checkLogin">
+					<div class="row">
+						<div class="col-md-4">
+							<h4>
+								<small style="color: black;">Email Address</small>
+							</h4>
+							<input type="text" id="email" name="email" ng-model="username" />
+						</div>
+						<div class="col-md-4">
+							<h4>
+								<small style="color: black;">Password</small>
+							</h4>
+							<input type="password" id="pass" name="pass" ng-model="password" />
+						</div>
+						<div class="col-md-4">
+							<h4>
+								<small style="color: black;"></small>
+							</h4>
+							<input type="button" class="btn btn-default" value="Sign In"
+								style="margin-top: 25px;" 
+								ng-click="checkLoginFunction(username,password);" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<form ng-submit="submit();" method="post" ng-controller="validateCtrl"
+		name="signUpForm" novalidate>
+		<div class="row"
+			style="margin-left: auto; margin-right: auto; width: 1024px; overflow: hidden; margin-top: 30px;">
+			<div class="col-md-12">
+				<h2 align="center">Join the World's Largest Professional
+					Network</h2>
+				<h3 align="center" ng-show="account_message_success"
+					style="color: green;">
+					Account Successfully Created, you can now Sign In
+					</p>
+					<h3 align="center" ng-show="account_message_failure"
+						style="color: red;">Account creation failed, please try Again</h3>
+			</div>
+			<div class="col-md-8">
+				<img alt="" src="/images/image-1.png" width="500px" height="330px"
+					style="margin: 20px;" />
+			</div>
+			<div class="col-md-4">
+				<h3>Get Started - It's free</h3>
+				<h4>
+					<small style="color: black;">Registration takes less than 2
+						minutes</small>
+				</h4>
+
+				<div class="row">
+					<div class="col-md-6">
+						<input class="form-control" type="text" id="firstname"
+							name="firstname" placeholder="First Name" ng-model="firstname"
+							required> <span style="color: red"
+							ng-show="signUpForm.firstname.$dirty && signUpForm.firstname.$invalid"
+							style="font-size: 12px;"> <span
+							ng-show="signUpForm.firstname.$error.required"
+							style="font-size: 12px;">First Name is required.</span>
+						</span>
+					</div>
+					<div class="col-md-6">
+						<input class="form-control" type="text" id="lastname"
+							name="lastname" placeholder="Last Name" ng-model="lastname">
+
+					</div>
+				</div>
+
+				<input class="form-control" type="email" name="user" ng-model="user"
+					id="registerEmail" name="registerEmail" placeholder="Email Address"
+					style="margin-top: 20px;" required> <span
+					style="color: red"
+					ng-show="signUpForm.user.$dirty && signUpForm.user.$invalid">
+					<span ng-show="signUpForm.user.$error.required">Email is
+						required.</span> <span ng-show="signUpForm.user.$error.email">Invalid
+						email address.</span>
+				</span> <input class="form-control" type="password" id="registerPassword"
+					name="registerPassword" style="margin-top: 20px;"
+					placeholder="********" ng-model="registerPassword" required>
+				<span style="color: red"
+					ng-show="signUpForm.registerPassword.$dirty && signUpForm.registerPassword.$invalid"
+					style="font-size: 12px;"> <span
+					ng-show="signUpForm.registerPassword.$error.required"
+					style="font-size: 12px;">Password is required.</span>
+				</span>
+
+				<h4>
+					<small>By clicking Join Now, you agree to LinkedIn's User
+						Agreement, Privacy Policy and Cookie Policy.</small>
+				</h4>
+				<input type="submit" value="Join Now" class="btn btn-success"
+					style="background: #F6E312; border-color: #E9AC1A; color: black; width: 100%;"
+					ng-disabled="signUpForm.user.$dirty && signUpForm.user.$invalid">
+
+
+			</div>
+		</div>
+	</form>
+
+	<script>
+	
+	var login = angular.module('login', []);
+	//*************************************************************************************************//
+	login.controller('validateCtrl',function($scope,$http)
+			{
+		// -----------------------------------------------------------------------------------//
+		$scope.submit = function() {
+			$http({
+				method : "POST",
+				url : '/signup',
+				data : {
+					"firstname" : $scope.firstname,
+					"lastname" : $scope.lastname,
+					"email" : $scope.user,
+					"password" : $scope.registerPassword
+				}
+			}).success(function(response) {
+				var responseJSON = JSON.stringify(response);
+
+				if (response.statusCode == 200) {
+					$scope.account_message_success = true;
+				} else {
+					$scope.account_message_failure = true;
+				}
+				alert('response is Successfull');
+				console.log('In Success : ' + responseJSON.statusCode);
+			}).error(function(error) {
+				alert("error");
+			});
+		};
+		// -----------------------------------------------------------------------------------//
+		
+			});
+
+	//*************************************************************************************************//
+
+	login.controller('checkLogin',function($scope,$http)
+			{
+		// -----------------------------------------------------------------------------------//
+		
+		$scope.checkLoginFunction = function(username,password)
+		{
+			$http({
+				method : 'POST',
+				url : '/checkLogin',
+				data : {
+					"username" : username,
+					"password" : password
+				}
+			}).success(function(data, status, headers, config) {
+				if (data.statusCode == 200) 
+				{
+					window.location = '/home';
+				} else {
+					alert("Invalid username or password");
+				}
+			}).error(function(data, status, headers, config) {
+			});
+		};
+		// -----------------------------------------------------------------------------------//
+			
+			});
+	
+	//*************************************************************************************************//
+	</script>
+</body>
+</html>

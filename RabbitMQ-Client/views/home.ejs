@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title><%= title %></title>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+<link rel="shortcut icon" href="/images/logo.png">
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+</head>
+<body ng-app="home">
+	<!-------------------------------------------------------- Header Starts -------------------------------------------------------------------------->
+
+	<div class="row" id="header" name="header">
+		<div class="col-md-2"></div>
+		<div class="col-md-2" style="margin: 10px;">
+			<img src="/images/logo.png" width="40px" height="40px" />
+		</div>
+		<div class="col-md-4">
+			<h4 style="margin: 10px; color: white;"><%= firstname %>
+				&nbsp;<%= lastname %></h4>
+			<h4>
+				<small style="margin: 10px; color: white;">Last logged In :
+					<%= lastLoggedIn %></small>
+			</h4>
+		</div>
+		<div class="col-md-2" style="margin: 10px;" ng-controller="logout">
+			<input type="button" class="btn btn-default" id="logout"
+				name="logout" value="Sign Out" ng-click="logout();" />
+		</div>
+	</div>
+
+	<!-------------------------------------------------------- Header Ends -------------------------------------------------------------------------->
+	<!-------------------------------------------------------- Profile Starts -------------------------------------------------------------------------->
+
+	<div ng-controller="profile"
+		ng-init="getProfile();statusReadOnly='';locationAndJobProfileReadOnly='';getConnectionsCount();">
+		<div class="row" ng-show="!readOnlyHeader"
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="profileChange();" class="btn btn-default">Edit</button>
+			</div>
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h2>
+					<span ng-model="firstnameReadOnly"><%= firstname %></span> <span
+						ng-model="lastnameReadOnly"><%= lastname %></span>
+				</h2>
+				<h3>
+					<small style="color: black;"><span>{{statusReadOnly}}</span></small>
+				</h3>
+			</div>
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h4>
+					<small><span>{{locationAndJobProfileReadOnly}}</span></small>
+				</h4>
+			</div>
+			<form action="connections" method="get" id="connections">
+				<div class="col-md-12"
+					style="margin-left: 20px; margin-right: 20px;">
+					<h4>
+						<span id="connections"
+							onclick="document.forms.connections.submit();"
+							style="cursor: pointer;"><small><span
+								style="color: black; font-size: 20px;">{{countConnections}}</span>
+								connections<span>{{connectionsCountPending}}</span></small></span>
+					</h4>
+				</div>
+			</form>
+		</div>
+		<div class="row" ng-show="readOnlyHeader"
+			ng-init="firstname='<%= firstname %>';lastname='<%= lastname %>';"
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h4>
+					<small>First Name</small>
+				</h4>
+				<input type="text" id="firstname" name="firstname"
+					ng-model="firstname" value="<%= firstname %>" style="width: 90%;" />
+
+				<h4>
+					<small>Last Name</small>
+				</h4>
+				<input type="text" id="lastname" name="lastname" ng-model="lastname"
+					value="<%= lastname %>" style="width: 90%;" />
+				<h4>
+					<small>Current Status</small>
+				</h4>
+				<input type="text" id="status" name="status"
+					value="{{statusReadOnly}}" style="width: 90%;" />
+			</div>
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h4>
+					<small>Location and Job Profile</small>
+				</h4>
+				<input type="text" id="locationAndJobProfile"
+					name="locationAndJobProfile"
+					value="{{locationAndJobProfileReadOnly}}" style="width: 90%;" />
+			</div>
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h4>
+					<span id="connections"></span><small> connections</small>
+				</h4>
+			</div>
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="profileSave();" class="btn btn-default">Save</button>
+			</div>
+		</div>
+	</div>
+	<!-------------------------------------------------------- Profile Ends -------------------------------------------------------------------------->
+
+	<!-------------------------------------------------------- Summary Starts -------------------------------------------------------------------------->
+
+	<div ng-controller="summary" ng-init="getSummary();">
+		<div class="row" ng-show="!readOnlySummary"
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="summaryChange();" class="btn btn-default">Edit</button>
+
+			</div>
+
+			<div class="col-md-12"
+				style="margin-left: 20px; margin-right: 20px; padding-right: 20px;">
+				<h3>Summary</h3>
+				<h3>
+					<small><span>{{summary}}</span></small>
+				</h3>
+			</div>
+		</div>
+
+		<div class="row" ng-show="readOnlySummary" ng-init=""
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h3>Summary</h3>
+				<textarea rows="6" cols="80" style="width: 90%;" id="summaryToSave">{{summary}}</textarea>
+			</div>
+
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="summarySave();" class="btn btn-default">Save</button>
+
+			</div>
+		</div>
+
+	</div>
+	<!-------------------------------------------------------- Summary Ends -------------------------------------------------------------------------->
+
+	<!-------------------------------------------------------- Skills Start -------------------------------------------------------------------------->
+
+	<div ng-controller="skills" ng-init="getSkills();">
+		<div class="row" ng-show="!readOnlySkills"
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="skillsChange();" class="btn btn-default">Edit</button>
+			</div>
+			
+			<div class="col-md-12"
+				style="margin-left: 20px; margin-right: 20px; padding-right: 20px;">
+				<h3>Skills</h3>
+			</div>
+			
+			<div ng-repeat="skillsets in skills" style="margin-left: 20px; margin-right: 20px;" >
+				<div class="col-md-2" >
+					<h3>
+						<small style="color: black;">{{skillsets.skill}}</small>
+					</h3>
+				</div>
+			</div>
+		</div>
+		<div class="row" ng-show="readOnlySkills"
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<div ng-repeat="skillsets in skills">
+				<div class="col-md-2" style="margin: 10px; padding: 10px;">
+					<input type="text" id="skill" name="skill" class="form-control" 
+						ng-model="skillsets.skill" style="width: 90%;" />
+				</div>
+			</div>
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="skillsSave();" class="btn btn-default">Save</button>
+			</div>
+		</div>
+	</div>
+
+	<!-------------------------------------------------------- Skills Ends -------------------------------------------------------------------------->
+
+	<!-------------------------------------------------------- Education Starts -------------------------------------------------------------------------->
+	<div ng-controller="education" ng-init="getEducationDetails();"
+		style="margin-bottom: 20px;">
+		<div class="row" ng-show="!readOnlyEducation"
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="educationChange();" class="btn btn-default">Edit</button>
+			</div>
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h3>Education</h3>
+			</div>
+			<div class="col-md-12">
+				<div class="row" ng-repeat="values in education"
+					style="margin-left: 20px; margin-right: 20px; margin-top: 10px;">
+					<div class="col-md-6">
+						<h4>{{values.education_degree}}</h4>
+					</div>
+					<div class="col-md-6">
+						<h4>
+							<small>{{values.education_year}} </small>
+						</h4>
+					</div>
+					<div class="col-md-12">
+						<h4>
+							<small>{{values.education_university}}</small>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row" ng-show="readOnlyEducation"
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h3>Education</h3>
+			</div>
+			<div class="col-md-12">
+				<div class="row" ng-repeat="values in education"
+					style="margin-left: 20px; margin-right: 20px; margin-top: 10px;">
+					<div class="col-md-6">
+						<h4>
+							<small>Degree</small>
+						</h4>
+						<input type="text" id="educationDegree" name="educationDegree"
+							ng-model="values.education_degree" style="width: 90%;" />
+					</div>
+					<div class="col-md-6">
+						<h4>
+							<small>Year</small>
+						</h4>
+						<input type="text" id="educationYear" name="educationYear"
+							ng-model="values.education_year" style="width: 100%;" />
+					</div>
+					<div class="col-md-12" style="margin-top: 10px;">
+						<h4>
+							<small>University</small>
+						</h4>
+						<input type="text" id="educationUniversity"
+							name="educationUniversity" ng-model="values.education_university"
+							style="width: 100%;" />
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="educationSave();" class="btn btn-default">Save</button>
+			</div>
+		</div>
+	</div>
+	<!-------------------------------------------------------- Education Ends -------------------------------------------------------------------------->
+
+	<!-------------------------------------------------------- Experience Starts ------------------------------------------------------------------------>
+
+	<div ng-controller="experience" ng-init="getExperienceDetails();" style="margin-bottom: 40px;">
+		<div class="row" ng-show="!readOnlyExperience" ng-init=""
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="experienceChange();" class="btn btn-default">Edit</button>
+			</div>
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h3>Experience</h3>
+			</div>
+			<div class="col-md-12">
+				<div class="row" ng-repeat="valuesExp in experience"
+					style="margin-left: 20px; margin-right: 20px; margin-top: 10px;">
+					<div class="col-md-6">
+						<h4>{{valuesExp.experience_company_name}}</h4>
+					</div>
+					<div class="col-md-6">
+						<h4>
+							<small>{{valuesExp.experience_year}} </small>
+						</h4>
+					</div>
+					<div class="col-md-12">
+						<h4>
+							<small style="color: black;">{{valuesExp.experience_designation}}</small>
+						</h4>
+					</div>
+					<div class="col-md-12">
+						<h4>
+							<small>{{valuesExp.experience_details}}</small>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row" ng-show="readOnlyExperience"
+			style="margin-left: auto; margin-right: auto; width: 900px; overflow: hidden; margin-top: 30px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15);">
+			<div class="col-md-12" style="margin-left: 20px; margin-right: 20px;">
+				<h3>Experience</h3>
+			</div>
+			<div class="col-md-12">
+				<div class="row" ng-repeat="valuesExp in experience"
+					style="margin-left: 20px; margin-right: 20px; margin-top: 10px;">
+					<div class="col-md-6">
+						<h4>
+							<small>Company Name</small>
+						</h4>
+						<input type="text" id="experienceCompanyName"
+							name="experienceCompanyName"
+							ng-model="valuesExp.experience_company_name" style="width: 90%;" />
+					</div>
+					<div class="col-md-6">
+						<h4>
+							<small>Year</small>
+						</h4>
+						<input type="text" id="experienceYear" name="experienceYear"
+							ng-model="valuesExp.experience_year" style="width: 100%;" />
+					</div>
+					<div class="col-md-12">
+						<h4>
+							<small>Designation</small>
+						</h4>
+						<input type="text" id="experiencePosition"
+							name="experiencePosition"
+							ng-model="valuesExp.experience_designation" style="width: 100%;" />
+					</div>
+					<div class="col-md-12">
+						<h4>
+							<small>Summary</small>
+						</h4>
+						<input type="text" id="experienceSummary" name="experienceSummary"
+							ng-model="valuesExp.experience_details" style="width: 100%;" />
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12" style="margin: 20px;">
+				<button ng-click="experienceSave();" class="btn btn-default">Save</button>
+			</div>
+		</div>
+	</div>
+	<!-------------------------------------------------------- Experience Ends -------------------------------------------------------------------------->
+
+
+	<!-------------------------------------------------------- Angular JS Scripts Starts -------------------------------------------------------------->
+
+	<script>
+		var home = angular.module('home', []);
+
+		/* ################################################################################ */
+
+		home.controller('logout', function($scope, $http) {
+
+			$scope.logout = function() {
+				$http({
+					method : 'POST',
+					url : '/logout'
+				}).success(function(data, status, headers, config) {
+					if (data.statusCode == 204) {
+						window.location = "/";
+					}
+				}).error(function(data, status, headers, config) {
+				});
+			};
+
+		});
+
+		/* ################################################################################ */
+		home
+				.controller(
+						'profile',
+						function($scope, $http) {
+							/* ========================================= */
+							$scope.getProfile = function() {
+								$scope.statusReadOnly = "Graddute";
+								$http({
+									method : 'GET',
+									url : '/getProfile'
+								})
+										.success(
+												function(data, status, headers,
+														config) {
+													$scope.statusReadOnly = data.profile_status;
+													$scope.locationAndJobProfileReadOnly = data.profile_location;
+												}).error(
+												function(data, status, headers,
+														config) {
+												});
+
+							};
+
+							/* ========================================= */
+
+							$scope.getConnectionsCount = function() {
+								$http({
+									method : 'GET',
+									url : '/getConnectionsCount'
+								})
+										.success(
+												function(data, status, headers,
+														config) {
+													$scope.countConnections = data.countConnections;
+													if (Number(data.connectionsPending) > 0) {
+														$scope.connectionsCountPending = "("
+																+ data.connectionsPending
+																+ " requests Pending)";
+													}
+
+												}).error(
+												function(data, status, headers,
+														config) {
+												});
+							};
+
+							/* ========================================= */
+							$scope.profileChange = function() {
+								if ($scope.readOnlyHeader) {
+									$scope.readOnlyHeader = false;
+								} else {
+									$scope.readOnlyHeader = true;
+								}
+							};
+							/* ========================================= */
+							$scope.profileSave = function() {
+								var status = $("#status").val();
+								var locationandJobProfile = $(
+										"#locationAndJobProfile").val();
+								if ($scope.readOnlyHeader) {
+
+									$http(
+											{
+												method : 'POST',
+												url : '/profile',
+												data : {
+													"profileStatus" : status,
+													"profilelocationAndJobProfile" : locationandJobProfile,
+													"profileFirstName" : $scope.firstname,
+													"profileLastName" : $scope.lastname
+												}
+											})
+											.success(
+													function(response) {
+														$scope.readOnlyHeader = false;
+														$scope.statusReadOnly = status
+														$scope.firstname = response.results[0].firstname
+														$scope.lastname = response.results[0].lastname;
+														
+														$scope.locationAndJobProfileReadOnly = locationandJobProfile
+													}).error(function(error) {
+												alert("error");
+											});
+
+								} else {
+									$http(
+											{
+												method : 'POST',
+												url : '/profile',
+												data : {
+													"profileStatus" : status,
+													"profilelocationAndJobProfile" : locationandJobProfile,
+													"profileFirstName" : $scope.firstname,
+													"profileLastName" : $scope.lastname
+												}
+											})
+											.success(
+													function(response) {
+														$scope.readOnlyHeader = false;
+														$scope.statusReadOnly = status
+
+														$scope.locationAndJobProfileReadOnly = locationandJobProfile
+													}).error(function(error) {
+												alert("error");
+											});
+								}
+							}
+							/* ========================================= */
+						});
+		/* ################################################################################ */
+
+		home.controller('summary', function($scope, $http) {
+			$scope.getSummary = function() {
+				$http({
+					method : 'GET',
+					url : '/getSummary'
+				}).success(function(data, status, headers, config) {
+					$scope.summary = data.profile_summary;
+				}).error(function(data, status, headers, config) {
+				});
+			};
+
+			$scope.summaryChange = function() {
+				if ($scope.readOnlySummary) {
+					$scope.readOnlySummary = false;
+				} else {
+					$scope.readOnlySummary = true;
+				}
+			};
+
+			$scope.summarySave = function() {
+				var summaryToSave = $("#summaryToSave").val();
+				if ($scope.readOnlySummary) {
+					$http({
+						method : 'POST',
+						url : '/summary',
+						data : {
+							"profileSummary" : summaryToSave
+						}
+					}).success(function(response) {
+						$scope.readOnlySummary = false;
+						$scope.summary = summaryToSave;
+					}).error(function(error) {
+						alert("error");
+					});
+				} else {
+					$http({
+						method : 'POST',
+						url : '/summary',
+						data : {
+							"profileSummary" : summaryToSave
+						}
+					}).success(function(response) {
+						$scope.readOnlySummary = false;
+						$scope.summary = summaryToSave;
+					}).error(function(error) {
+						alert("error");
+					});
+				}
+			}
+
+		});
+
+		/* ################################################################################ */
+
+		home.controller('skills', function($scope, $http) {
+			$scope.getSkills = function() {
+				$http({
+					method : 'GET',
+					url : '/getSkills'
+				}).success(function(data, status, headers, config) {
+
+					if (data.statusCode == 204) {
+						 var array = data.resultSet.split(",");
+						
+						$scope.skills = [ {
+							skill : array[0]
+						}, {
+							skill : array[1]
+						}, {
+							skill : array[2]
+						}, {
+							skill : array[3]
+						}, {
+							skill : array[4]
+						}, {
+							skill : array[5]
+						}, {
+							skill : array[6]
+						}, {
+							skill : array[7]
+						}, {
+							skill : array[8]
+						}, {
+							skill : array[9]
+						} ]; 
+					} else {
+						$scope.skills = [ {
+							skill : ""
+						}, {
+							skill : ""
+						}, {
+							skill : ""
+						}, {
+							skill : ""
+						}, {
+							skill : ""
+						}, {
+							skill : ""
+						}, {
+							skill : ""
+						}, {
+							skill : ""
+						}, {
+							skill : ""
+						}, {
+							skill : ""
+						} ];
+					}
+
+				}).error(function(data, status, headers, config) {
+				});
+			};
+
+			$scope.skillsChange = function() {
+				if ($scope.readOnlySkills) {
+					$scope.readOnlySkills = false;
+				} else {
+					$scope.readOnlySkills = true;
+				}
+			};
+
+			$scope.skillsSave = function() {
+				var skillsObject = JSON.stringify($scope.skills);
+				if ($scope.readOnlySummary) {
+					$http({
+						method : 'POST',
+						url : '/skills',
+						data : {
+							"skillsObject" : skillsObject
+						}
+					}).success(function(response) {
+						$scope.readOnlySkills = false;
+					}).error(function(error) {
+						alert("error");
+					});
+				} else {
+					$http({
+						method : 'POST',
+						url : '/skills',
+						data : {
+							"skillsObject" : skillsObject
+						}
+					}).success(function(response) {
+						$scope.readOnlySkills = false;
+					}).error(function(error) {
+						alert("error");
+					});
+				}
+			}
+
+		});
+
+		/* ################################################################################ */
+
+		home
+				.controller(
+						'education',
+						function($scope, $http) {
+
+							$scope.getEducationDetails = function() {
+								$http({
+									method : 'GET',
+									url : '/getEducationDetails'
+								})
+										.success(
+												function(data, status, headers,
+														config) {
+													if (data.statusCode == 204) {
+														//alert(data.resultSet);
+														$scope.education = data.resultSet;
+													} else {
+														$scope.education = [
+																{
+																	education_id : "0",
+																	education_degree : "",
+																	education_university : "No Data here, edit this section",
+																	education_year : ""
+																},
+																{
+																	education_id : "0",
+																	education_degree : "",
+																	education_university : "",
+																	education_year : ""
+																} ];
+
+													}
+
+												}).error(
+												function(data, status, headers,
+														config) {
+												});
+							};
+
+							$scope.educationChange = function() {
+								if ($scope.readOnlyEducation) {
+									$scope.readOnlyEducation = false;
+
+								} else {
+									$scope.readOnlyEducation = true;
+
+								}
+							};
+
+							$scope.educationSave = function() {
+								var educationObject = JSON
+										.stringify($scope.education);
+								//alert(educationObject);
+								if ($scope.readOnlyEducation) {
+									$http({
+										method : 'POST',
+										url : '/education',
+										data : {
+											"educationObject" : educationObject
+										}
+									}).success(function(response) {
+										$scope.readOnlyEducation = false;
+									}).error(function(error) {
+										alert("error");
+									});
+
+								} else {
+									$http({
+										method : 'POST',
+										url : '/education',
+										data : {
+											"educationObject" : educationObject
+										}
+									}).success(function(response) {
+										$scope.readOnlyEducation = true;
+									}).error(function(error) {
+										alert("error");
+									});
+								}
+							};
+						});
+
+		/* ################################################################################ */
+
+		home
+				.controller(
+						'experience',
+						function($scope, $http) {
+
+							$scope.getExperienceDetails = function() {
+								$http({
+									method : 'GET',
+									url : '/getExperienceDetails'
+								})
+										.success(
+												function(data, status, headers,
+														config) {
+
+													if (data.statusCode == 204) {
+														$scope.experience = data.resultSet;
+													} else {
+														$scope.experience = [
+																{
+																	experience_id : "0",
+																	experience_company_name : "",
+																	experience_details : "No Data here, edit this section",
+																	experience_year : "",
+																	experience_designation : ""
+
+																},
+																{
+																	experience_id : "0",
+																	experience_company_name : "",
+																	experience_details : "",
+																	experience_year : "",
+																	experience_designation : ""
+																} ];
+
+													}
+
+												}).error(
+												function(data, status, headers,
+														config) {
+												});
+							};
+
+							$scope.experienceChange = function() {
+								if ($scope.readOnlyExperience) {
+									$scope.readOnlyExperience = false;
+
+								} else {
+									$scope.readOnlyExperience = true;
+
+								}
+							};
+
+							$scope.experienceSave = function() {
+								var experienceObject = JSON
+										.stringify($scope.experience);
+								if ($scope.readOnlyExperience) {
+									$http(
+											{
+												method : 'POST',
+												url : '/experience',
+												data : {
+													"experienceObject" : experienceObject
+												}
+											}).success(function(response) {
+										$scope.readOnlyExperience = false;
+									}).error(function(error) {
+										alert("error");
+									});
+
+								} else {
+									$http(
+											{
+												method : 'POST',
+												url : '/experience',
+												data : {
+													"experienceObject" : experienceObject
+												}
+											}).success(function(response) {
+										$scope.readOnlyExperience = true;
+									}).error(function(error) {
+										alert("error");
+									});
+
+								}
+							};
+
+						});
+	</script>
+
+	<!-------------------------------------------------------- Angular JS Scripts Ends --------------------------------------------------------------->
+
+</body>
+</html>
